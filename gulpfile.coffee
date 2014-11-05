@@ -6,7 +6,8 @@ coffee = require 'gulp-coffee'
 uglify = require 'gulp-uglify'
 del = require 'del'
 runSequence = require 'run-sequence'
-ngAnnotate = require 'gulp-ng-annotate';
+ngAnnotate = require 'gulp-ng-annotate'
+docco = require 'gulp-docco'
 
 
 # CONFIG ---------------------------------------------------------
@@ -28,6 +29,11 @@ gulp.task 'lint', ->
   .pipe(coffeelint())
   .pipe(coffeelint.reporter())
 
+gulp.task 'docco', ->
+  gulp.src(sources.coffee)
+  .pipe(docco())
+  .pipe(gulp.dest('docs'))
+#
 gulp.task 'release', ->
   gulp.src(sources.coffee)
   .pipe(coffee().on('error', gutil.log))
@@ -36,10 +42,10 @@ gulp.task 'release', ->
   .pipe(gulp.dest(destinations.js))
 
 gulp.task 'clean', (cb) ->
-  del(['dist/'], cb)
+  del(['dist/', 'docs/'], cb)
 
 gulp.task 'build', ->
-  runSequence 'clean', ['lint', 'release']
+  runSequence 'clean', ['lint', 'docco', 'release']
 
 gulp.task 'default', [
   'build'
