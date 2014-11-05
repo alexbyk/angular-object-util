@@ -9,6 +9,7 @@ runSequence = require 'run-sequence'
 ngAnnotate = require 'gulp-ng-annotate'
 docco = require 'gulp-docco'
 rename = require 'gulp-rename'
+pushDocs = require 'gulp-gh-pages'
 
 
 # CONFIG ---------------------------------------------------------
@@ -17,6 +18,7 @@ isProd = gutil.env.type is 'prod'
 
 sources =
   coffee: 'src/*.coffee'
+  docs: 'docs/*'
 
 # dev and prod will both go to dist for simplicity sake
 destinations =
@@ -53,6 +55,10 @@ gulp.task 'src:min', ->
 
 gulp.task 'clean', (cb) ->
   del(['dist/', 'docs/'], cb)
+
+gulp.task 'push-docs', ->
+  gulp.src(sources.docs)
+  .pipe(pushDocs())
 
 gulp.task 'build', ->
   runSequence 'clean', ['lint', 'docco', 'src:min', 'src']
