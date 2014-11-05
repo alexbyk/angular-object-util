@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>angular-object-util.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>angular-object-util.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-string">'use strict'</span>
+
+angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'object-util'</span>, [])
+.factory <span class="hljs-string">'_ou'</span>, <span class="hljs-function">-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><strong>_ou.proxyMethod</strong><code>(dest, source, methods, argsUnshift)</code></p>
+<p>creates a proxy methods that will invoke <code>methods</code> in <code>source</code> object and
+installs it into <code>dest</code> object.</p>
+<p><code>this</code> in method will be a <code>source</code> object</p>
+<p><code>methods</code> is a map of the methods  where keys are the names that will be used
+for methods in <code>dest</code> object, and values are the names of <code>source</code> methods
+in the form <code>{&#39;destMethod&#39;: &#39;sourceMethod&#39;}</code></p>
+<p>if <code>methods</code> isn’t an Object, it will be convirted to it using <code>_ou.toMap</code></p>
+<pre><code>source =
+  <span class="hljs-attribute">foo1</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-string">'foo1'</span>
+  <span class="hljs-attribute">foo2</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-string">'foo2'</span>
+
+dest = {}
+_ou.proxyMethod(dest, source, {<span class="hljs-attribute">bar1</span>: <span class="hljs-string">'foo1'</span>, <span class="hljs-attribute">bar2</span>: <span class="hljs-string">'foo2'</span>})
+
+<span class="hljs-comment"># 'foo1'</span>
+<span class="hljs-built_in">console</span>.log dest.bar1()
+</code></pre><p><code>argsUnshift</code> could be an array of any types or a single object. If provided,
+than actual arguments will be passed after unshifting them.
+Convinient when you whant to proxy methods source service to controller whis
+some common default value</p>
+<pre><code>source = <span class="hljs-attribute">foo</span>: <span class="hljs-function"><span class="hljs-params">(name, lastname)</span> -&gt;</span> <span class="hljs-string">"foo-<span class="hljs-subst">#{name}</span>-<span class="hljs-subst">#{lastname}</span>"</span>
+dest   = {}
+
+<span class="hljs-comment"># now dest.foo(lastname) will be the same as source.foo('alex', lastname)</span>
+_ou.proxyMethod(dest, source, <span class="hljs-string">'foo'</span>, <span class="hljs-string">'alex'</span>)
+<span class="hljs-comment"># 'foo-alex-cartman'</span>
+<span class="hljs-built_in">console</span>.log dest.foo(<span class="hljs-string">'cartman'</span>)
+
+<span class="hljs-comment"># 2 arguments will be unshifted dest real method</span>
+_ou.proxyMethod(dest, source, <span class="hljs-string">'foo'</span>, [<span class="hljs-string">'alex'</span>, <span class="hljs-string">'cartman'</span>])
+<span class="hljs-comment"># 'foo-alex-cartman'</span>
+<span class="hljs-built_in">console</span>.log dest.foo()
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">
+  <span class="hljs-title">_proxyMethod</span> = <span class="hljs-params">(dest, source, dMeth, sMeth, argsUnshift=[])</span> -&gt;</span>
+    dest[dMeth] = <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span>
+      args.unshift(arg) <span class="hljs-keyword">for</span> arg <span class="hljs-keyword">in</span> argsUnshift.reverse()
+      msg = <span class="hljs-string">"<span class="hljs-subst">#{source}</span>.<span class="hljs-subst">#{sMeth}</span> isn't a function"</span>
+      <span class="hljs-keyword">throw</span> msg <span class="hljs-keyword">new</span> Error <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span>(source[sMeth]) == <span class="hljs-string">'function'</span>
+      source[sMeth].apply(source, args)
+<span class="hljs-function">
+  <span class="hljs-title">proxyMethod</span> = <span class="hljs-params">(dest, source, methods, argsUnshift=[])</span> -&gt;</span>
+    map = toMap(methods)
+    argsUnshift = [argsUnshift] <span class="hljs-keyword">unless</span> Array.isArray argsUnshift
+    <span class="hljs-keyword">for</span> dMeth, sMeth <span class="hljs-keyword">of</span> map
+      _proxyMethod(dest, source, dMeth, sMeth, argsUnshift)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p><strong> _ou.delegateMethod</strong> <code>(object, attr, methods)</code></p>
+<p>delegates a method to an attribute. <code>attr</code> is a string, a name of attribute.</p>
+<p><code>methods</code> is a map of the methods  where keys are the names that will be used
+for methods in object, and values are the names of source methods in <code>obj.attr</code>
+in the form <code>{&#39;objMethod&#39;: &#39;attrMethod&#39;}</code></p>
+<p>if method isn’t an Object, it will be convirted to it using <code>_ou.toMap</code></p>
+<p>When invoking, <code>this</code> will be <code>obj[attr]</code></p>
+<pre><code>client = <span class="hljs-attribute">foo</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-string">'foo'</span>
+obj = <span class="hljs-attribute">client</span>: client
+_ou.delegateMethod(obj, <span class="hljs-string">'client'</span>, <span class="hljs-string">'foo'</span>)
+
+<span class="hljs-comment"># "foo", the same as obj.client.foo()</span>
+<span class="hljs-built_in">console</span>.log obj.foo()
+
+<span class="hljs-comment"># install under another name</span>
+_ou.delegateMethod(obj, <span class="hljs-string">'client'</span>, {<span class="hljs-attribute">bar</span>: <span class="hljs-string">'foo'</span>})
+
+<span class="hljs-comment"># "foo", the same as obj.client.foo()</span>
+<span class="hljs-built_in">console</span>.log obj.bar()
+</code></pre><p>If you want to hide method from own attribute, you can pass a prototype.
+Because <code>this</code> will be <code>obj[attr]</code>, it will work</p>
+<pre><code>client =
+  <span class="hljs-attribute">getType</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-property">@type</span>
+  <span class="hljs-attribute">type</span>: <span class="hljs-string">'client'</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyClass</span></span>
+  <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(client)</span> -&gt;</span> <span class="hljs-property">@client</span> = client
+
+obj = <span class="hljs-keyword">new</span> MyClass(client)
+_ou.delegateMethod(<span class="hljs-attribute">MyClass</span>::, <span class="hljs-string">'client'</span>, <span class="hljs-string">'getType'</span>)
+
+<span class="hljs-comment"># 'client'</span>
+<span class="hljs-built_in">console</span>.log obj.getType()
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">  <span class="hljs-title">_delegateMethod</span> = <span class="hljs-params">(object, attr, objMeth, attrMeth)</span> -&gt;</span>
+    object[objMeth] = <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+      <span class="hljs-keyword">unless</span> attrObj = @[attr]
+        err = <span class="hljs-string">"Attribute with name <span class="hljs-subst">#{attr}</span> doesn't exist in <span class="hljs-subst">#{object}</span>"</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error (err) <span class="hljs-keyword">unless</span> attrObj
+
+      <span class="hljs-keyword">unless</span> method = attrObj[attrMeth]
+        err = <span class="hljs-string">"Method with name <span class="hljs-subst">#{attrMeth}</span> doesn't exist
+          in <span class="hljs-subst">#{attrObj}</span> (<span class="hljs-subst">#{attr}</span>)"</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(err) <span class="hljs-keyword">unless</span> method
+
+      method.apply attrObj, arguments
+<span class="hljs-function">
+  <span class="hljs-title">delegateMethod</span> = <span class="hljs-params">(object, attr, methods)</span> -&gt;</span>
+    map = toMap(methods)
+    _delegateMethod(object, attr, oMeth, aMeth) <span class="hljs-keyword">for</span> oMeth, aMeth <span class="hljs-keyword">of</span> map</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>_ou.toMap</strong><code>(data)</code></p>
+<p>returns an object from array, string or object</p>
+<p>when <code>data</code> is neither <code>String</code> no <code>Array</code>, returns it without modifications</p>
+<p>when <code>data</code> is <code>String</code> with value <code>&quot;value&quot;</code>, returns <code>{value: &quot;value&quot;}</code> object</p>
+<p>when data is <code>Array</code> with value <code>[&#39;v1&#39;, &#39;v2&#39;]</code>, returns <code>{v1: &quot;v1&quot;, v2: &quot;v2&quot;}</code> and so on</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">
+  <span class="hljs-title">toMap</span> = <span class="hljs-params">(data)</span> -&gt;</span>
+    map = {}
+    <span class="hljs-keyword">switch</span>
+      <span class="hljs-keyword">when</span> angular.isString(data) <span class="hljs-keyword">then</span> map[data] = data
+      <span class="hljs-keyword">when</span> angular.isArray(data)  <span class="hljs-keyword">then</span> map[key] = key <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> data
+      <span class="hljs-keyword">else</span> map = data
+    map</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>_ou.filterKeysNot</strong><code>(object, re)</code></p>
+<p>returns a new recursively filtered object form <code>object</code> without keys that match <code>re</code></p>
+<pre><code> obj = {<span class="hljs-attribute">foo</span>: <span class="hljs-number">2</span>, <span class="hljs-attribute">bar</span>: [{<span class="hljs-attribute">foo</span>: <span class="hljs-number">3</span>, <span class="hljs-attribute">bar</span>: <span class="hljs-number">4</span>}]}
+ <span class="hljs-comment"># {bar: [bar: 4]}</span>
+ <span class="hljs-built_in">console</span>.log _ou.filterKeysNot(obj, <span class="hljs-regexp">/^foo$/</span>)
+</code></pre><p>filters keys of objects only. so</p>
+<pre><code> unfiltered = [<span class="hljs-string">'foo'</span>, <span class="hljs-string">'bar'</span>, {<span class="hljs-attribute">foo</span>: <span class="hljs-string">'bar'</span>, <span class="hljs-attribute">ok</span>: <span class="hljs-number">1</span>}]
+ filtered = _ou.filterKeysNot(unfiltered)
+
+ <span class="hljs-comment"># `['foo', 'bar', {ok: 1}]`</span>
+ <span class="hljs-built_in">console</span>.log filtered
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">
+  <span class="hljs-title">filterKeysNot</span> = <span class="hljs-params">(object, re)</span> -&gt;</span>
+<span class="hljs-function">    <span class="hljs-title">_filter</span> = <span class="hljs-params">(obj)</span> -&gt;</span>
+      <span class="hljs-keyword">switch</span>
+        <span class="hljs-keyword">when</span> <span class="hljs-keyword">typeof</span> obj != <span class="hljs-string">'object'</span> <span class="hljs-keyword">then</span> obj
+        <span class="hljs-keyword">when</span> Array.isArray obj
+          _filter val <span class="hljs-keyword">for</span> val <span class="hljs-keyword">in</span> obj
+        <span class="hljs-keyword">else</span>
+          res = {}
+          res[key] = _filter val <span class="hljs-keyword">for</span> own key, val <span class="hljs-keyword">of</span> obj <span class="hljs-keyword">when</span> <span class="hljs-keyword">not</span> re.test(key)
+          res
+    _filter(object)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>_ou.mapKeys<code>(obj, map)</code></strong></p>
+<p>returns a new object from <code>obj</code> where keys are recursively renamed by <code>map</code></p>
+<pre><code> obj = {<span class="hljs-attribute">foo</span>: <span class="hljs-string">'foo'</span>, <span class="hljs-attribute">bar</span>: <span class="hljs-string">'bar'</span>, <span class="hljs-attribute">baz</span>: <span class="hljs-string">'baz'</span>}
+ map = {<span class="hljs-attribute">foo</span>: <span class="hljs-string">'_foo'</span>, <span class="hljs-attribute">bar</span>: <span class="hljs-string">'_bar'</span>}
+ mapped = util.mapKeys(obj, map);
+ expect(mapped).toEqual {<span class="hljs-attribute">_foo</span>: <span class="hljs-string">'foo'</span>, <span class="hljs-attribute">_bar</span>: <span class="hljs-string">'bar'</span>, <span class="hljs-attribute">baz</span>: <span class="hljs-string">'baz'</span>}
+
+ obj = [{<span class="hljs-attribute">foo</span>: <span class="hljs-string">'foo'</span>, <span class="hljs-attribute">baz</span>: <span class="hljs-string">'baz'</span>}]
+ map = {<span class="hljs-attribute">foo</span>: <span class="hljs-string">'_foo'</span>}
+ mapped = util.mapKeys(obj, map)
+ expect(mapped).toEqual [{<span class="hljs-attribute">_foo</span>: <span class="hljs-string">'foo'</span>,  <span class="hljs-attribute">baz</span>: <span class="hljs-string">'baz'</span>}]
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">
+  <span class="hljs-title">mapKeys</span> = <span class="hljs-params">(obj, rMap)</span> -&gt;</span>
+    rKeys = Object.keys(rMap)
+<span class="hljs-function">    <span class="hljs-title">_map</span> = <span class="hljs-params">(obj)</span> -&gt;</span>
+      <span class="hljs-keyword">switch</span>
+        <span class="hljs-keyword">when</span> <span class="hljs-keyword">typeof</span> obj != <span class="hljs-string">'object'</span> <span class="hljs-keyword">then</span> obj
+        <span class="hljs-keyword">when</span> Array.isArray obj
+          _map val <span class="hljs-keyword">for</span> val <span class="hljs-keyword">in</span> obj
+        <span class="hljs-keyword">else</span>
+          res = {}
+          <span class="hljs-keyword">for</span> own key, val <span class="hljs-keyword">of</span> obj <span class="hljs-comment"># check in rMap</span>
+            newkey = <span class="hljs-keyword">if</span> key <span class="hljs-keyword">in</span> rKeys <span class="hljs-keyword">then</span> rMap[key] <span class="hljs-keyword">else</span> key
+            res[newkey] = _map val
+          res
+
+    _map(obj)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p><strong>_ou.replace<code>(dest, source)</code></strong></p>
+<p>replaces <code>dest</code> object with the content of <code>source</code> object by ref, removing
+previous content from <code>dest</code></p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <pre><code> dst = {<span class="hljs-attribute">bad</span>: <span class="hljs-number">1</span>}
+ src = {<span class="hljs-attribute">foo</span>: <span class="hljs-number">1</span>, <span class="hljs-attribute">bar</span>: <span class="hljs-number">2</span>}
+ util.replace(dst,src)
+ expect(dst).toEqual {<span class="hljs-attribute">foo</span>: <span class="hljs-number">1</span>, <span class="hljs-attribute">bar</span>: <span class="hljs-number">2</span>}
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">
+  <span class="hljs-title">replace</span> = <span class="hljs-params">(dst, src)</span> -&gt;</span>
+    <span class="hljs-keyword">delete</span> dst[key] <span class="hljs-keyword">for</span> own key <span class="hljs-keyword">of</span> dst
+    angular.extend dst, src
+
+  {
+    <span class="hljs-attribute">proxyMethod</span>:    proxyMethod
+    <span class="hljs-attribute">delegateMethod</span>: delegateMethod
+    <span class="hljs-attribute">toMap</span>:          toMap
+    <span class="hljs-attribute">filterKeysNot</span>:  filterKeysNot
+    <span class="hljs-attribute">mapKeys</span>:        mapKeys
+    <span class="hljs-attribute">replace</span>:        replace
+  }</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
