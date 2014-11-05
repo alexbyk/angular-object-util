@@ -4,7 +4,7 @@ gutil = require 'gulp-util'
 coffeelint = require 'gulp-coffeelint'
 coffee = require 'gulp-coffee'
 uglify = require 'gulp-uglify'
-clean = require 'gulp-clean'
+del = require 'del'
 runSequence = require 'run-sequence'
 ngAnnotate = require 'gulp-ng-annotate';
 
@@ -35,8 +35,8 @@ gulp.task 'release', ->
   .pipe(if isProd then uglify() else gutil.noop())
   .pipe(gulp.dest(destinations.js))
 
-gulp.task 'clean', ->
-  gulp.src(['dist/'], {read: false}).pipe(clean())
+gulp.task 'clean', (cb) ->
+  del(['dist/'], cb)
 
 gulp.task 'build', ->
   runSequence 'clean', ['lint', 'release']

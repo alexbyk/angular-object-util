@@ -1,1 +1,166 @@
-(function(){"use strict";var r=[].slice,t={}.hasOwnProperty,n=[].indexOf||function(r){for(var t=0,n=this.length;n>t;t++)if(t in this&&this[t]===r)return t;return-1};angular.module("object-util",[]).factory("_ou",function(){var e,a,u,i,o,f,s,c;return c=function(t,n,e,a,u){return null==u&&(u=[]),t[e]=function(){var t,e,i,o,f,s;for(e=1<=arguments.length?r.call(arguments,0):[],s=u.reverse(),o=0,f=s.length;f>o;o++)t=s[o],e.unshift(t);if(i=""+n+"."+a+" isn't a function","function"!=typeof n[a])throw i(new Error);return n[a].apply(n,e)}},i=function(r,t,n,e){var a,u,i,o;null==e&&(e=[]),u=f(n),Array.isArray(e)||(e=[e]),o=[];for(a in u)i=u[a],o.push(c(r,t,a,i,e));return o},s=function(r,t,n,e){return r[n]=function(){var n,a,u;if(!(n=this[t])&&(a="Attribute with name "+t+" doesn't exist in "+r,!n))throw new Error(a);if(!(u=n[e])&&(a="Method with name "+e+" doesn't exist in "+n+" ("+t+")",!u))throw new Error(a);return u.apply(n,arguments)}},e=function(r,t,n){var e,a,u,i;a=f(n),i=[];for(u in a)e=a[u],i.push(s(r,t,u,e));return i},f=function(r){var t,n,e,a;switch(n={},!1){case!angular.isString(r):n[r]=r;break;case!angular.isArray(r):for(e=0,a=r.length;a>e;e++)t=r[e],n[t]=t;break;default:n=r}return n},a=function(r,n){var e;return(e=function(r){var a,u,i,o,f,s;switch(!1){case"object"==typeof r:return r;case!Array.isArray(r):for(s=[],o=0,f=r.length;f>o;o++)i=r[o],s.push(e(i));return s;default:u={};for(a in r)t.call(r,a)&&(i=r[a],n.test(a)||(u[a]=e(i)));return u}})(r)},u=function(r,e){var a,u;return a=Object.keys(e),(u=function(r){var i,o,f,s,c,l,h;switch(!1){case"object"==typeof r:return r;case!Array.isArray(r):for(h=[],c=0,l=r.length;l>c;c++)s=r[c],h.push(u(s));return h;default:f={};for(i in r)t.call(r,i)&&(s=r[i],o=n.call(a,i)>=0?e[i]:i,f[o]=u(s));return f}})(r)},o=function(r,n){var e;for(e in r)t.call(r,e)&&delete r[e];return angular.extend(r,n)},{proxyMethod:i,delegateMethod:e,toMap:f,filterKeysNot:a,mapKeys:u,replace:o}})}).call(this);
+(function() {
+  'use strict';
+  var __slice = [].slice,
+    __hasProp = {}.hasOwnProperty,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  angular.module('object-util', []).factory('_ou', function() {
+    var delegateMethod, filterKeysNot, mapKeys, proxyMethod, replace, toMap, _delegateMethod, _proxyMethod;
+    _proxyMethod = function(dest, source, dMeth, sMeth, argsUnshift) {
+      if (argsUnshift == null) {
+        argsUnshift = [];
+      }
+      return dest[dMeth] = function() {
+        var arg, args, msg, _i, _len, _ref;
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        _ref = argsUnshift.reverse();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          arg = _ref[_i];
+          args.unshift(arg);
+        }
+        msg = "" + source + "." + sMeth + " isn't a function";
+        if (typeof source[sMeth] !== 'function') {
+          throw msg(new Error);
+        }
+        return source[sMeth].apply(source, args);
+      };
+    };
+    proxyMethod = function(dest, source, methods, argsUnshift) {
+      var dMeth, map, sMeth, _results;
+      if (argsUnshift == null) {
+        argsUnshift = [];
+      }
+      map = toMap(methods);
+      if (!Array.isArray(argsUnshift)) {
+        argsUnshift = [argsUnshift];
+      }
+      _results = [];
+      for (dMeth in map) {
+        sMeth = map[dMeth];
+        _results.push(_proxyMethod(dest, source, dMeth, sMeth, argsUnshift));
+      }
+      return _results;
+    };
+    _delegateMethod = function(object, attr, objMeth, attrMeth) {
+      return object[objMeth] = function() {
+        var attrObj, err, method;
+        if (!(attrObj = this[attr])) {
+          err = "Attribute with name " + attr + " doesn't exist in " + object;
+          if (!attrObj) {
+            throw new Error(err);
+          }
+        }
+        if (!(method = attrObj[attrMeth])) {
+          err = "Method with name " + attrMeth + " doesn't exist in " + attrObj + " (" + attr + ")";
+          if (!method) {
+            throw new Error(err);
+          }
+        }
+        return method.apply(attrObj, arguments);
+      };
+    };
+    delegateMethod = function(object, attr, methods) {
+      var aMeth, map, oMeth, _results;
+      map = toMap(methods);
+      _results = [];
+      for (oMeth in map) {
+        aMeth = map[oMeth];
+        _results.push(_delegateMethod(object, attr, oMeth, aMeth));
+      }
+      return _results;
+    };
+    toMap = function(data) {
+      var key, map, _i, _len;
+      map = {};
+      switch (false) {
+        case !angular.isString(data):
+          map[data] = data;
+          break;
+        case !angular.isArray(data):
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            key = data[_i];
+            map[key] = key;
+          }
+          break;
+        default:
+          map = data;
+      }
+      return map;
+    };
+    filterKeysNot = function(object, re) {
+      var _filter;
+      _filter = function(obj) {
+        var key, res, val, _i, _len, _results;
+        switch (false) {
+          case typeof obj === 'object':
+            return obj;
+          case !Array.isArray(obj):
+            _results = [];
+            for (_i = 0, _len = obj.length; _i < _len; _i++) {
+              val = obj[_i];
+              _results.push(_filter(val));
+            }
+            return _results;
+            break;
+          default:
+            res = {};
+            for (key in obj) {
+              if (!__hasProp.call(obj, key)) continue;
+              val = obj[key];
+              if (!re.test(key)) {
+                res[key] = _filter(val);
+              }
+            }
+            return res;
+        }
+      };
+      return _filter(object);
+    };
+    mapKeys = function(obj, rMap) {
+      var rKeys, _map;
+      rKeys = Object.keys(rMap);
+      _map = function(obj) {
+        var key, newkey, res, val, _i, _len, _results;
+        switch (false) {
+          case typeof obj === 'object':
+            return obj;
+          case !Array.isArray(obj):
+            _results = [];
+            for (_i = 0, _len = obj.length; _i < _len; _i++) {
+              val = obj[_i];
+              _results.push(_map(val));
+            }
+            return _results;
+            break;
+          default:
+            res = {};
+            for (key in obj) {
+              if (!__hasProp.call(obj, key)) continue;
+              val = obj[key];
+              newkey = __indexOf.call(rKeys, key) >= 0 ? rMap[key] : key;
+              res[newkey] = _map(val);
+            }
+            return res;
+        }
+      };
+      return _map(obj);
+    };
+    replace = function(dst, src) {
+      var key;
+      for (key in dst) {
+        if (!__hasProp.call(dst, key)) continue;
+        delete dst[key];
+      }
+      return angular.extend(dst, src);
+    };
+    return {
+      proxyMethod: proxyMethod,
+      delegateMethod: delegateMethod,
+      toMap: toMap,
+      filterKeysNot: filterKeysNot,
+      mapKeys: mapKeys,
+      replace: replace
+    };
+  });
+
+}).call(this);
