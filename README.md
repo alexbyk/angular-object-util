@@ -7,8 +7,8 @@ angular-object-util
 ### Usage
 
 ```js
-app.module('myApp').controller(function('_ou', $scope){
-  # $scope.foo() to $scope.bar.foo()
+app.module('myApp').controller('myCtrl', function(_ou, $scope){
+  // $scope.foo() -> $scope.bar.foo()
   _ou.delegateMethod($scope, 'bar', 'foo')
 });
 ```
