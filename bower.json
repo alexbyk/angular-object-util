@@ -5,7 +5,7 @@
     "alexbyk <alex@alexbyk.com>"
   ],
   "description": "Angular service that provides some helpfull manipulation functions with object",
-  "main": "dist/angular-object-util.js",
+  "main": "dist/angular-object-util.min.js",
   "keywords": [
     "angular",
     "angularjs",
