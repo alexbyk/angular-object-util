@@ -18,7 +18,7 @@ isProd = gutil.env.type is 'prod'
 
 sources =
   coffee: 'src/*.coffee'
-  docs: 'docs/*'
+  docs: 'docs/**/*'
 
 # dev and prod will both go to dist for simplicity sake
 destinations =
