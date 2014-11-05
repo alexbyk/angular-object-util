@@ -12,3 +12,7 @@ app.module('myApp').controller(function('_ou', $scope){
   _ou.delegateMethod($scope, 'bar', 'foo')
 });
 ```
+
+### Documentation
+
+Documentation is available [here](http://alexbyk.github.io/angular-object-util/angular-object-util.html), currently as docco comments
