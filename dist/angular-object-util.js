@@ -5,7 +5,7 @@
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module('object-util', []).factory('_ou', function() {
-    var delegateMethod, filterKeysNot, mapKeys, proxyMethod, replace, toMap, _delegateMethod, _proxyMethod;
+    var delegateMethod, filterKeysNot, mapKeys, objectToQuery, proxyMethod, replace, toMap, _delegateMethod, _proxyMethod;
     _proxyMethod = function(dest, source, dMeth, sMeth, argsUnshift) {
       if (argsUnshift == null) {
         argsUnshift = [];
@@ -153,13 +153,25 @@
       }
       return angular.extend(dst, src);
     };
+    objectToQuery = function(object) {
+      var arr, encoded, key, val;
+      arr = [];
+      for (key in object) {
+        if (!__hasProp.call(object, key)) continue;
+        val = object[key];
+        encoded = encodeURIComponent(val);
+        arr.push("" + key + "=" + encoded);
+      }
+      return arr.join('&');
+    };
     return {
       proxyMethod: proxyMethod,
       delegateMethod: delegateMethod,
       toMap: toMap,
       filterKeysNot: filterKeysNot,
       mapKeys: mapKeys,
-      replace: replace
+      replace: replace,
+      objectToQuery: objectToQuery
     };
   });
 
