@@ -205,6 +205,23 @@ angular.module('object-util', [])
   replace = (dst, src) ->
     delete dst[key] for own key of dst
     angular.extend dst, src
+ 
+# **_ou.objectToQuery`(object)`**
+#
+# converts object to query string
+#
+#      #'foo=1&bar=2'
+#      util.objectToQuery({foo: 1, bar: 2})
+#
+#      # 'foo=%26&bar=2'
+#      util.objectToQuery({foo: '&', bar: 2})
+
+  objectToQuery = (object) ->
+    arr = []
+    for own key,val of object
+      encoded = encodeURIComponent(val)
+      arr.push("#{key}=#{encoded}")
+    arr.join('&')
 
   {
     proxyMethod:    proxyMethod
@@ -213,4 +230,5 @@ angular.module('object-util', [])
     filterKeysNot:  filterKeysNot
     mapKeys:        mapKeys
     replace:        replace
+    objectToQuery:  objectToQuery
   }
