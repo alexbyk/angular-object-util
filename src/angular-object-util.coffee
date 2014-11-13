@@ -223,6 +223,29 @@ angular.module('object-util', [])
       arr.push("#{key}=#{encoded}")
     arr.join('&')
 
+# ** _ou.equalSets`(o1, o2, keys)`**
+#
+# tests if 2 objects have the same sets by given keys.
+# returns true or false
+#
+#      o1 = eq: {foo: 1}, no: 'a'
+#      o2 = eq: {foo: 1}, no: 'b'
+#
+#      # true
+#      _ou.equalSets(o1, o2, ['eq'])
+#
+#      # false
+#      _ou.equalSets(o1, o2, ['eq', 'no'])
+
+
+  equalSets = (o1, o2, keys) ->
+    angular.equals(o1, o2)
+    for key in keys
+      return false unless angular.equals o1[key], o2[key]
+
+    return true
+
+
   {
     proxyMethod:    proxyMethod
     delegateMethod: delegateMethod
@@ -231,4 +254,5 @@ angular.module('object-util', [])
     mapKeys:        mapKeys
     replace:        replace
     objectToQuery:  objectToQuery
+    equalSets:      equalSets
   }

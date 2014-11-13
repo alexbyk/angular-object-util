@@ -319,7 +319,40 @@ previous content from <code>dest</code></p>
     <span class="hljs-keyword">for</span> own key,val <span class="hljs-keyword">of</span> object
       encoded = encodeURIComponent(val)
       arr.push(<span class="hljs-string">"<span class="hljs-subst">#{key}</span>=<span class="hljs-subst">#{encoded}</span>"</span>)
-    arr.join(<span class="hljs-string">'&amp;'</span>)
+    arr.join(<span class="hljs-string">'&amp;'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p><strong> _ou.equalSets<code>(o1, o2, keys)</code></strong></p>
+<p>tests if 2 objects have the same sets by given keys.
+returns true or false</p>
+<pre><code> o1 = <span class="hljs-attribute">eq</span>: {<span class="hljs-attribute">foo</span>: <span class="hljs-number">1</span>}, <span class="hljs-attribute">no</span>: <span class="hljs-string">'a'</span>
+ o2 = <span class="hljs-attribute">eq</span>: {<span class="hljs-attribute">foo</span>: <span class="hljs-number">1</span>}, <span class="hljs-attribute">no</span>: <span class="hljs-string">'b'</span>
+
+ <span class="hljs-comment"># true</span>
+ _ou.equalSets(o1, o2, [<span class="hljs-string">'eq'</span>])
+
+ <span class="hljs-comment"># false</span>
+ _ou.equalSets(o1, o2, [<span class="hljs-string">'eq'</span>, <span class="hljs-string">'no'</span>])
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">
+
+  <span class="hljs-title">equalSets</span> = <span class="hljs-params">(o1, o2, keys)</span> -&gt;</span>
+    angular.equals(o1, o2)
+    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> keys
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">unless</span> angular.equals o1[key], o2[key]
+
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+
 
   {
     <span class="hljs-attribute">proxyMethod</span>:    proxyMethod
@@ -329,6 +362,7 @@ previous content from <code>dest</code></p>
     <span class="hljs-attribute">mapKeys</span>:        mapKeys
     <span class="hljs-attribute">replace</span>:        replace
     <span class="hljs-attribute">objectToQuery</span>:  objectToQuery
+    <span class="hljs-attribute">equalSets</span>:      equalSets
   }</pre></div></div>
             
         </li>
