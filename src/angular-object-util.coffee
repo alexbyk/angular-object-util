@@ -243,16 +243,13 @@ angular.module('object-util', [])
     
 
   equalSets = (o1, o2, keys) ->
-    angular.equals(o1, o2)
     for key in keys
       return false unless equals o1[key], o2[key]
-
     return true
 
   findSet = (array, set) ->
     for cur in array
       return cur if equalSets(cur, set, Object.keys(set))
-
     return
 
   {
