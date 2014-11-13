@@ -5,7 +5,7 @@
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module('object-util', []).factory('_ou', function() {
-    var delegateMethod, equalSets, filterKeysNot, mapKeys, objectToQuery, proxyMethod, replace, toMap, _delegateMethod, _proxyMethod;
+    var delegateMethod, equalSets, equals, filterKeysNot, findSet, findSetIndex, mapKeys, objectToQuery, proxyMethod, replace, toMap, _delegateMethod, _findSet, _proxyMethod;
     _proxyMethod = function(dest, source, dMeth, sMeth, argsUnshift) {
       if (argsUnshift == null) {
         argsUnshift = [];
@@ -164,16 +164,44 @@
       }
       return arr.join('&');
     };
+    equals = function(o1, o2) {
+      return JSON.stringify(o1) === JSON.stringify(o2);
+    };
     equalSets = function(o1, o2, keys) {
       var key, _i, _len;
-      angular.equals(o1, o2);
       for (_i = 0, _len = keys.length; _i < _len; _i++) {
         key = keys[_i];
-        if (!angular.equals(o1[key], o2[key])) {
+        if (!equals(o1[key], o2[key])) {
           return false;
         }
       }
       return true;
+    };
+    _findSet = function(array, set, returnIndex) {
+      var cur, i, _i, _len;
+      for (i = _i = 0, _len = array.length; _i < _len; i = ++_i) {
+        cur = array[i];
+        if (equalSets(cur, set, Object.keys(set))) {
+          if (returnIndex) {
+            return i;
+          } else {
+            return cur;
+          }
+        }
+      }
+      return;
+      return set = {
+        variant: {
+          foo: 1
+        },
+        $id: 'foo'
+      };
+    };
+    findSet = function(array, set) {
+      return _findSet(array, set, 0);
+    };
+    findSetIndex = function(array, set) {
+      return _findSet(array, set, 1);
     };
     return {
       proxyMethod: proxyMethod,
@@ -183,7 +211,10 @@
       mapKeys: mapKeys,
       replace: replace,
       objectToQuery: objectToQuery,
-      equalSets: equalSets
+      equalSets: equalSets,
+      equals: equals,
+      findSet: findSet,
+      findSetIndex: findSetIndex
     };
   });
 

@@ -223,6 +223,28 @@ angular.module('object-util', [])
       arr.push("#{key}=#{encoded}")
     arr.join('&')
 
+# ** _ou.equals`(o1, o2)`**
+# check if objects are equal. returns true or false. `angular.equals` doesn't respect $keys,
+# this method does
+#
+#      # true
+#      _ou.equals(
+#        {$foo: 2, bar: {foo: 1}},
+#        {$foo: 2, bar: {foo: 1}})
+#      )
+#      # false
+#      _ou.equals(
+#        {$foo: 1, bar: {foo: 1}},
+#        {$foo: 2, bar: {foo: 1}})
+#      )
+#      _ou.equals(
+#        {$foo: 1, bar: {foo: 1}},
+#        {$foo: 1, bar: {foo: 2}})
+#      )
+
+  equals = (o1, o2) ->
+    JSON.stringify(o1) == JSON.stringify(o2)
+    
 # ** _ou.equalSets`(o1, o2, keys)`**
 #
 # tests if 2 objects have the same sets by given keys.
@@ -237,20 +259,43 @@ angular.module('object-util', [])
 #      # false
 #      _ou.equalSets(o1, o2, ['eq', 'no'])
 
-
-  equals = (o1, o2) ->
-    JSON.stringify(o1) == JSON.stringify(o2)
-    
-
   equalSets = (o1, o2, keys) ->
     for key in keys
       return false unless equals o1[key], o2[key]
     return true
 
-  findSet = (array, set) ->
-    for cur in array
-      return cur if equalSets(cur, set, Object.keys(set))
+  _findSet = (array, set, returnIndex) ->
+    for cur, i in array
+      if equalSets(cur, set, Object.keys(set))
+        return if returnIndex then i else cur
     return
+
+# ** _ou.findSet`(array, set)`**
+# search for subset in array of supersets. This means if one of the elements of `array`
+# have all keys and values from `set`, that element will be returned. Undefined value will
+# be returned otherwise
+
+#      arr = [
+#        {variant: {foo: 1}, $id: 'foo', count: 0}
+#        {variant: {foo: 2}, $id: 'bar', count: 0}
+#      ]
+#      # arr[0]
+#      _ou.findSet(arr, {variant: foo: 1})
+#      _ou.findSet(arr, {variant: foo: 1}, $id: 'foo')
+#
+#      # undefined
+#      _ou.findSet(arr, {variant: foo: 1, notExisting: 1})
+
+
+    set = {variant: {foo: 1}, $id: 'foo'}
+  findSet = (array, set) ->
+    _findSet(array, set, 0)
+
+# ** _ou.findSetIndex`(array, set)`**
+# Does the same as `findSet` except return index in array or undefined
+
+  findSetIndex = (array, set) ->
+    _findSet(array, set, 1)
 
   {
     proxyMethod:    proxyMethod
@@ -263,4 +308,5 @@ angular.module('object-util', [])
     equalSets:      equalSets
     equals:         equals
     findSet:        findSet
+    findSetIndex:   findSetIndex
   }
