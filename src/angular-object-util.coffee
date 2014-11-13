@@ -238,6 +238,10 @@ angular.module('object-util', [])
 #      _ou.equalSets(o1, o2, ['eq', 'no'])
 
 
+  equals = (o1, o2) ->
+    JSON.stringify(o1) == JSON.stringify(o2)
+    
+
   equalSets = (o1, o2, keys) ->
     angular.equals(o1, o2)
     for key in keys
@@ -245,6 +249,11 @@ angular.module('object-util', [])
 
     return true
 
+  findSet = (array, set) ->
+    for cur in array
+      return cur if equalSets(cur, set, Object.keys(set))
+
+    return
 
   {
     proxyMethod:    proxyMethod
@@ -255,4 +264,6 @@ angular.module('object-util', [])
     replace:        replace
     objectToQuery:  objectToQuery
     equalSets:      equalSets
+    equals:         equals
+    findSet:        findSet
   }
