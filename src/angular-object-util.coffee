@@ -245,7 +245,7 @@ angular.module('object-util', [])
   equalSets = (o1, o2, keys) ->
     angular.equals(o1, o2)
     for key in keys
-      return false unless angular.equals o1[key], o2[key]
+      return false unless equals o1[key], o2[key]
 
     return true
 
