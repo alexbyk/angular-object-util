@@ -26,7 +26,7 @@ describe 'Service: _ou proxyMethod', ->
     expect(source.foo()).toBe 'bar'
 
   it 'proxyMethod array of methods', ->
-    source = 
+    source =
       foo: -> 'foo'
       bar: -> 'bar'
     dest = {}
@@ -35,7 +35,7 @@ describe 'Service: _ou proxyMethod', ->
     expect(dest.bar()).toBe 'bar'
 
   it 'proxyMethod with mapping', ->
-    source = 
+    source =
       foo1: -> 'foo1'
       foo2: -> 'foo2'
 
@@ -56,8 +56,11 @@ describe 'Service: _ou proxyMethod', ->
     util.proxyMethod(dest, source, 'foo', ['alex', 'cartman'])
     expect(dest.foo(22)).toBe 'foo-alex-cartman-22'
 
+    # second time because of reverse in prev versions
+    expect(dest.foo(22)).toBe 'foo-alex-cartman-22'
+
   it 'proxyMethod this must be the same', ->
-    source = 
+    source =
       type : 'foo'
       getType: -> @.type
     dest   = {}

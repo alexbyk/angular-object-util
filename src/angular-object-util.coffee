@@ -47,7 +47,7 @@ angular.module('object-util', [])
 
   _proxyMethod = (dest, source, dMeth, sMeth, argsUnshift=[]) ->
     dest[dMeth] = (args...) ->
-      args.unshift(arg) for arg in argsUnshift.reverse()
+      args.unshift.apply(args, argsUnshift)
       msg = "#{source}.#{sMeth} isn't a function"
       throw msg new Error unless typeof(source[sMeth]) == 'function'
       source[sMeth].apply(source, args)

@@ -11,13 +11,9 @@
         argsUnshift = [];
       }
       return dest[dMeth] = function() {
-        var arg, args, msg, _i, _len, _ref;
+        var args, msg;
         args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-        _ref = argsUnshift.reverse();
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          arg = _ref[_i];
-          args.unshift(arg);
-        }
+        args.unshift.apply(args, argsUnshift);
         msg = "" + source + "." + sMeth + " isn't a function";
         if (typeof source[sMeth] !== 'function') {
           throw msg(new Error);

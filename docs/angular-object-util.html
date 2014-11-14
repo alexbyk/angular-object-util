@@ -83,7 +83,7 @@ _ou.proxyMethod(dest, source, <span class="hljs-string">'foo'</span>, [<span cla
             <div class="content"><div class='highlight'><pre><span class="hljs-function">
   <span class="hljs-title">_proxyMethod</span> = <span class="hljs-params">(dest, source, dMeth, sMeth, argsUnshift=[])</span> -&gt;</span>
     dest[dMeth] = <span class="hljs-function"><span class="hljs-params">(args...)</span> -&gt;</span>
-      args.unshift(arg) <span class="hljs-keyword">for</span> arg <span class="hljs-keyword">in</span> argsUnshift.reverse()
+      args.unshift.apply(args, argsUnshift)
       msg = <span class="hljs-string">"<span class="hljs-subst">#{source}</span>.<span class="hljs-subst">#{sMeth}</span> isn't a function"</span>
       <span class="hljs-keyword">throw</span> msg <span class="hljs-keyword">new</span> Error <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span>(source[sMeth]) == <span class="hljs-string">'function'</span>
       source[sMeth].apply(source, args)
