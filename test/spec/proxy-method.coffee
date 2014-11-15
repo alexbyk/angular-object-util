@@ -51,13 +51,19 @@ describe 'Service: _ou proxyMethod', ->
     expect(dest.foo('cartman')).toBe 'foo-alex-cartman'
 
   it 'proxyMethod with argsUnshift as array', ->
-    source = foo: (name, lastname, age) -> "foo-#{name}-#{lastname}-#{age}"
+    args = null
+    source = foo: (name, lastname, age) ->
+      args = []
+      args.push(v) for v in arguments
+      "foo-#{name}-#{lastname}-#{age}"
     dest   = {}
     util.proxyMethod(dest, source, 'foo', ['alex', 'cartman'])
     expect(dest.foo(22)).toBe 'foo-alex-cartman-22'
+    expect(args).toEqual ['alex', 'cartman', 22]
 
     # second time because of reverse in prev versions
     expect(dest.foo(22)).toBe 'foo-alex-cartman-22'
+    expect(args).toEqual ['alex', 'cartman', 22]
 
   it 'proxyMethod this must be the same', ->
     source =
