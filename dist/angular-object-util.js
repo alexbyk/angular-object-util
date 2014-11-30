@@ -160,8 +160,40 @@
       }
       return arr.join('&');
     };
-    equals = function(o1, o2) {
-      return JSON.stringify(o1) === JSON.stringify(o2);
+    equals = function(a, b) {
+      var aKeys, atype, bKeys, btype, key, val;
+      if (a === b) {
+        return true;
+      }
+      atype = typeof a;
+      btype = typeof b;
+      if (atype !== btype) {
+        return false;
+      }
+      if (a == b) {
+        return true;
+      }
+      if ((!a && b) || (a && !b)) {
+        return false;
+      }
+      if (atype !== 'object') {
+        return false;
+      }
+      if (a.length && (a.length !== b.length)) {
+        return false;
+      }
+      aKeys = Object.keys(a);
+      bKeys = Object.keys(b);
+      if (aKeys.length !== bKeys.length) {
+        return false;
+      }
+      for (key in a) {
+        val = a[key];
+        if (!(key in b) || !equals(val, b[key])) {
+          return false;
+        }
+      }
+      return true;
     };
     equalSets = function(o1, o2, keys) {
       var key, _i, _len;

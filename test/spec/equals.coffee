@@ -15,7 +15,12 @@ describe 'Service: _ou equals', ->
     expect(util.equals({$foo: 2}, {$foo: 3})).toBe false
 
     expect(util.equals(
-      {$foo: 2, bar:[1,2]},
+      {$foo: 2, bar:[1,2], baz: {a: 'b'}},
+      {$foo: 2, bar:[1,2], baz: {a: 'b'}}
+    )).toBe true
+
+    expect(util.equals(
+      {bar:[1,2], $foo: 2},
       {$foo: 2, bar:[1,2]}
     )).toBe true
 

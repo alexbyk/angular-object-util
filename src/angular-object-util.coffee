@@ -242,8 +242,27 @@ angular.module('object-util', [])
 #        {$foo: 1, bar: {foo: 2}})
 #      )
 
-  equals = (o1, o2) ->
-    JSON.stringify(o1) == JSON.stringify(o2)
+  # copypaste & cut from r569594043/underscore.coffee
+  equals = (a, b) ->
+    return true if a is b
+    # Different types?
+    atype = typeof(a); btype = typeof(b)
+    return false if atype isnt btype
+    # Basic equality test (watch out for coercions).
+    return true if `a == b`
+    # One is falsy and the other truthy.
+    return false if (!a and b) or (a and !b)
+    # If a is not an object by this point, we can’t handle it.
+    return false if atype isnt 'object'
+    # Check for different array lengths before comparing contents.
+    return false if a.length and (a.length isnt b.length)
+    # Nothing else worked, deep compare the contents.
+    aKeys = Object.keys(a); bKeys = Object.keys(b)
+    # Different object sizes?
+    return false if aKeys.length isnt bKeys.length
+    # Recursive comparison of contents.
+    return false for key, val of a when !(key of b) or !equals(val, b[key])
+    true
     
 # ** _ou.equalSets`(o1, o2, keys)`**
 #
