@@ -225,7 +225,7 @@ angular.module('object-util', [])
 
 # ** _ou.equals`(o1, o2)`**
 # check if objects are equal. returns true or false. `angular.equals` doesn't respect $keys,
-# this method does
+# this method does but strips `$$keys`
 #
 #      # true
 #      _ou.equals(
@@ -256,12 +256,20 @@ angular.module('object-util', [])
     return false if atype isnt 'object'
     # Check for different array lengths before comparing contents.
     return false if a.length and (a.length isnt b.length)
-    # Nothing else worked, deep compare the contents.
-    aKeys = Object.keys(a); bKeys = Object.keys(b)
+
     # Different object sizes?
+    aKeys = []
+    bKeys = []
+    for k in Object.keys(a) when !(k.charAt(0) == '$' && k.charAt(1) == '$')
+      aKeys.push k
+    for k in Object.keys(b) when !(k.charAt(0) == '$' && k.charAt(1) == '$')
+      bKeys.push k
     return false if aKeys.length isnt bKeys.length
-    # Recursive comparison of contents.
-    return false for key, val of a when !(key of b) or !equals(val, b[key])
+
+    # Nothing else worked, deep compare the contents.
+    for key, val of a
+      unless key.charAt(0) == '$' and key.charAt(1) == '$'
+        return false if !(key of b) or !equals(val, b[key])
     true
     
 # ** _ou.equalSets`(o1, o2, keys)`**

@@ -161,7 +161,7 @@
       return arr.join('&');
     };
     equals = function(a, b) {
-      var aKeys, atype, bKeys, btype, key, val;
+      var aKeys, atype, bKeys, btype, k, key, val, _i, _j, _len, _len1, _ref, _ref1;
       if (a === b) {
         return true;
       }
@@ -182,15 +182,31 @@
       if (a.length && (a.length !== b.length)) {
         return false;
       }
-      aKeys = Object.keys(a);
-      bKeys = Object.keys(b);
+      aKeys = [];
+      bKeys = [];
+      _ref = Object.keys(a);
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        k = _ref[_i];
+        if (!(k.charAt(0) === '$' && k.charAt(1) === '$')) {
+          aKeys.push(k);
+        }
+      }
+      _ref1 = Object.keys(b);
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        k = _ref1[_j];
+        if (!(k.charAt(0) === '$' && k.charAt(1) === '$')) {
+          bKeys.push(k);
+        }
+      }
       if (aKeys.length !== bKeys.length) {
         return false;
       }
       for (key in a) {
         val = a[key];
-        if (!(key in b) || !equals(val, b[key])) {
-          return false;
+        if (!(key.charAt(0) === '$' && key.charAt(1) === '$')) {
+          if (!(key in b) || !equals(val, b[key])) {
+            return false;
+          }
         }
       }
       return true;

@@ -24,27 +24,51 @@ describe 'Service: _ou equals', ->
       {$foo: 2, bar:[1,2]}
     )).toBe true
 
-    expect(util.equals(
-      {$foo: 2, bar:[1,2]},
-      {$foo: 2})
-    ).toBe false
 
     expect(util.equals(
       {$foo: 2, bar: {foo: 1}},
-      {$foo: 2, bar: {foo: 1}})
-    ).toBe true
+      {$foo: 2, bar: {foo: 1}}
+    )).toBe true
+
+
+  it 'notEquals', ->
+    expect(util.equals(
+      {$foo: 2, bar:[1,2]},
+      {$foo: 2}
+    )).toBe false
 
     expect(util.equals(
       {$foo: 1, bar: {foo: 1}},
-      {$foo: 2, bar: {foo: 1}})
-    ).toBe false
+      {$foo: 2, bar: {foo: 1}}
+    )).toBe false
 
     expect(util.equals(
       {$foo: 2, bar: {foo: 1}},
-      {$foo: 2, bar: {foo: 2}})
-    ).toBe false
+      {$foo: 2, bar: {foo: 2}}
+    )).toBe false
 
     expect(util.equals(
       {$foo: 2, bar: {foo: 1}},
-      {$foo: 2})
-    ).toBe false
+      {$foo: 2}
+    )).toBe false
+
+  it 'notStrip $', ->
+    expect(util.equals(
+      {$foo: 2, bar: 2},
+      {$foo: 3, bar: 2}
+    )).toBe false
+    expect(util.equals(
+      {$foo: 3, bar: 2}
+      {$foo: 2, bar: 2},
+    )).toBe false
+
+  it 'strip $$', ->
+    expect(util.equals(
+      {$foo: 2, bar: 3, $$hashKey: 'noMatter'}
+      {$foo: 2, bar: 3}
+    )).toBe true
+
+    expect(util.equals(
+      {$foo: 2, bar: 3}
+      {$foo: 2, bar: 3, $$hashKey: 'noMatter'}
+    )).toBe true

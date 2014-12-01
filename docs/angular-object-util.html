@@ -332,7 +332,7 @@ previous content from <code>dest</code></p>
               </div>
               <p><strong> _ou.equals<code>(o1, o2)</code></strong>
 check if objects are equal. returns true or false. <code>angular.equals</code> doesn’t respect $keys,
-this method does</p>
+this method does but strips <code>$$keys</code></p>
 <pre><code> <span class="hljs-comment"># true</span>
  _ou.equals(
    {<span class="hljs-attribute">$foo</span>: <span class="hljs-number">2</span>, <span class="hljs-attribute">bar</span>: {<span class="hljs-attribute">foo</span>: <span class="hljs-number">1</span>}},
@@ -451,11 +451,17 @@ this method does</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>Nothing else worked, deep compare the contents.</p>
+              <p>Different object sizes?</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    aKeys = Object.keys(a); bKeys = Object.keys(b)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    aKeys = []
+    bKeys = []
+    <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> Object.keys(a) <span class="hljs-keyword">when</span> !(k.charAt(<span class="hljs-number">0</span>) == <span class="hljs-string">'$'</span> &amp;&amp; k.charAt(<span class="hljs-number">1</span>) == <span class="hljs-string">'$'</span>)
+      aKeys.push k
+    <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> Object.keys(b) <span class="hljs-keyword">when</span> !(k.charAt(<span class="hljs-number">0</span>) == <span class="hljs-string">'$'</span> &amp;&amp; k.charAt(<span class="hljs-number">1</span>) == <span class="hljs-string">'$'</span>)
+      bKeys.push k
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> aKeys.length <span class="hljs-keyword">isnt</span> bKeys.length</pre></div></div>
             
         </li>
         
@@ -466,11 +472,14 @@ this method does</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>Different object sizes?</p>
+              <p>Nothing else worked, deep compare the contents.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> aKeys.length <span class="hljs-keyword">isnt</span> bKeys.length</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">for</span> key, val <span class="hljs-keyword">of</span> a
+      <span class="hljs-keyword">unless</span> key.charAt(<span class="hljs-number">0</span>) == <span class="hljs-string">'$'</span> <span class="hljs-keyword">and</span> key.charAt(<span class="hljs-number">1</span>) == <span class="hljs-string">'$'</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> !(key <span class="hljs-keyword">of</span> b) <span class="hljs-keyword">or</span> !equals(val, b[key])
+    <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         
@@ -480,22 +489,6 @@ this method does</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
-              </div>
-              <p>Recursive comparison of contents.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">for</span> key, val <span class="hljs-keyword">of</span> a <span class="hljs-keyword">when</span> !(key <span class="hljs-keyword">of</span> b) <span class="hljs-keyword">or</span> !equals(val, b[key])
-    <span class="hljs-literal">true</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p><strong> _ou.equalSets<code>(o1, o2, keys)</code></strong></p>
 <p>tests if 2 objects have the same sets by given keys.
@@ -526,11 +519,11 @@ returns true or false</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p><strong> _ou.findSet<code>(array, set)</code></strong>
 search for subset in array of supersets. This means if one of the elements of <code>array</code>
@@ -542,11 +535,11 @@ be returned otherwise</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <pre><code> arr = [
    {<span class="hljs-attribute">variant</span>: {<span class="hljs-attribute">foo</span>: <span class="hljs-number">1</span>}, <span class="hljs-attribute">$id</span>: <span class="hljs-string">'foo'</span>, <span class="hljs-attribute">count</span>: <span class="hljs-number">0</span>}
@@ -570,11 +563,11 @@ be returned otherwise</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p><strong> _ou.findSetIndex<code>(array, set)</code></strong>
 Does the same as <code>findSet</code> except return index in array or undefined</p>
